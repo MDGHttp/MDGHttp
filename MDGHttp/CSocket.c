@@ -79,7 +79,7 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	char filename[1024];
 	FILE *res_file;
 	strcpy(filename, HTTP_HOME);
-	if (urlLen == 1)
+	if (urlLen <= 1)
 	{
 		strcat(filename, "/index.html\0");
 	}
@@ -96,12 +96,14 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 		strcat(filename, "/index.html\0");*/
 		return 0;
 	}
+	printf("[Web] Open file [%s]\n", filename);
 	fseek(res_file, 0, SEEK_END);
 	int file_len = ftell(res_file);
 	fseek(res_file, 0, SEEK_SET);
 	//char read_buf[2048];
-	int read_len = fread(read_buf, sizeof(char), sizeof(read_buf), res_file);
-	read_buf[--read_len] = '\0';
+	int read_len = 0;
+	/*int read_len = fread(read_buf, sizeof(char), sizeof(read_buf), res_file);
+	read_buf[--read_len] = '\0';*/
 	/* 向客户端发送响应数据 */
 
 	// 构造 HTTP 首
