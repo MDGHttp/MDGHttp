@@ -16,3 +16,4 @@ struct http_st_HttpReq
 	char type[2];
 	int http_state;
 };
+

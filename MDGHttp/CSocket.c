@@ -117,6 +117,7 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	if (type == NULL)
 	{
 		type = "text/html";
+		return -1;
 	}
 
 	int i = 0;
