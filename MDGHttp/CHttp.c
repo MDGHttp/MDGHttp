@@ -30,7 +30,7 @@ struct http_st_HttpReq http_fnGetHeaders(int CSocket_acpt_soc)
 	return req;
 }
 
-int http_fnSendHeaders(int client)
+int http_fnSendHeaders(int client,char *ContentType)
 {
 //  Connection:keep - alive
 //	Content - Length : 252
@@ -46,7 +46,10 @@ int http_fnSendHeaders(int client)
 	send(client, buf, strlen(buf), 0);
 	strcpy(buf, "Connection:keep-alive\r\n");//Referrer Policy:unsafe-url
 	send(client, buf, strlen(buf), 0);
-	sprintf(buf,"Content-Type: text/html;charset=utf-8\r\n");
+	char str[256] = "Content-Type: ";//: {0};charset=utf-8\r\n";
+	strcat(str, ContentType);
+	strcat(str, ";charset=utf-8\r\n");
+	sprintf(buf, str);
 	send(client, buf, strlen(buf), 0);
 	strcpy(buf, "\r\n");
 	send(client, buf, strlen(buf), 0);

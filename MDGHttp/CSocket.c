@@ -21,7 +21,10 @@ struct doc_type file_type[] =
 {
 	{ "html",    "text/html" },
 	{ "gif",     "image/gif" },
-	{ "jpeg",    "image/jpeg" },
+	{ "jpeg",    "image/jpeg" },//image/png css text/css
+	{ "png",    "image/png" },
+	{ "css",    "text/css" },
+	{ "js",    "application/x-javascript" }, //js application/x-javascript
 	{ NULL,      NULL }
 };
 
@@ -70,12 +73,15 @@ int CSocket_fnAcceptSocket(int  CSocket_srv_soc)
 	return CSocket_acpt_soc;
 }
 
+/**
+重
+**/
 int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 {
 	CSocket_HttpReq = http_fnGetHeaders(CSocket_acpt_soc);
 
 	int urlLen = strlen(CSocket_HttpReq.url);
-	char read_buf[20480];
+	char read_buf[HTTP_BUF_SIZE];
 	char filename[1024];
 	FILE *res_file;
 	strcpy(filename, HTTP_HOME);
@@ -102,13 +108,19 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	fseek(res_file, 0, SEEK_SET);
 	//char read_buf[2048];
 	int read_len = 0;
-	/*int read_len = fread(read_buf, sizeof(char), sizeof(read_buf), res_file);
-	read_buf[--read_len] = '\0';*/
 	/* 向客户端发送响应数据 */
 
 	// 构造 HTTP 首
+	//获取mime类型
+	char *type;
+	type = CHttp_getType(filename); /* 文件对应的 Content-Type */
+	if (type == NULL)
+	{
+		type = "text/html";
+	}
+
 	int i = 0;
-	i += http_fnSendHeaders(CSocket_acpt_soc);
+	i += http_fnSendHeaders(CSocket_acpt_soc, type);
 	char rec[1024];
 	int recv_len = recv(CSocket_acpt_soc, rec, 1024, 0);
 	//
@@ -140,22 +152,22 @@ void CSocket_fnClose(int CSocket)
 }
 
 ///发送响应数据
-int CSocket_FnSend_response(SOCKET soc, char *buf, int buf_len)
-{
-	// 构造 HTTP 首
-	int i = 0;
-	i+= http_fnSendHeaders(soc);
-	char rec[1024];
-	int recv_len = recv(soc, rec, 1024, 0);
-	//
-	i+= http_fnSendContent(soc,buf, buf_len);
-	if (1 != 0)
-	{
-		//error 
-		//TODO
-	}
-	return 1;
-}
+//int CSocket_FnSend_response(SOCKET soc, char *buf, int buf_len)
+//{
+//	// 构造 HTTP 首
+//	int i = 0;
+//	i+= http_fnSendHeaders(soc);
+//	char rec[1024];
+//	int recv_len = recv(soc, rec, 1024, 0);
+//	//
+//	i+= http_fnSendContent(soc,buf, buf_len);
+//	if (1 != 0)
+//	{
+//		//error 
+//		//TODO
+//	}
+//	return 1;
+//}
 
 
 int get_line(int sock, char *buf, int size)
@@ -186,4 +198,38 @@ int get_line(int sock, char *buf, int size)
 	}
 	buf[i] = '\0';
 	return(i);
+}
+
+char *CHttp_getType(const char *suf)
+{
+	struct doc_type *type;
+
+	for (type = file_type; type->suffix; type++)
+	{
+		int i = Indexof(suf,type->suffix );
+		if ( i >= 0)
+			return type->type;
+	}
+
+	return NULL;
+}
+
+int Indexof(const char *pSrc, const char *pDst)
+{
+	int i, j;
+	for (i = 0; pSrc[i] != '\0'; i++)
+	{
+		if (pSrc[i] != pDst[0])
+			continue;
+		j = 0;
+		while (pDst[j] != '\0' && pSrc[i + j] != '\0')
+		{
+			j++;
+			if (pDst[j] != pSrc[i + j])
+				break;
+		}
+		if (pDst[j] == '\0')
+			return i;
+	}
+	return -1;
 }
