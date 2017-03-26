@@ -8,7 +8,7 @@
 #include "CHttp.h"
 
 #pragma comment(lib, "ws2_32.lib")  /* WinSock使用的库函数 */
-
+ 
 
 
 /* 定义常量 */

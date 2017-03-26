@@ -21,11 +21,13 @@ int main(int argc, char *argv[])
 	//printf("%d \n" ,i);
 	if (i == 0)
 	{
-		CSocket_fnInitSocket();
-		while (CSocket_fnAcceptSocket() == 0)
+		int serverSocket = CSocket_fnInitSocket();
+		
+		while (1)
 		{
-			///改线程
-			CSocket_fnRecvSocket();
+			///改线程 TODO
+			int rec = CSocket_fnAcceptSocket(serverSocket);
+			CSocket_fnRecvSocket(rec);
 		}
 	}
 
