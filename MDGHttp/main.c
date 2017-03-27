@@ -2,7 +2,7 @@
 
 /**
 	main
-	2017-02-25
+	2017-03-25
 	m
 **/
 int main(int argc, char *argv[])
@@ -18,21 +18,16 @@ int main(int argc, char *argv[])
 	}	
 	
 	int i = init();
-	//printf("%d \n" ,i);
 	if (i == 0)
 	{
 		int serverSocket = CSocket_fnInitSocket();
-		
 		while (1)
 		{
-			///改线程 TODO
+			///改线程
 			int rec = CSocket_fnAcceptSocket(serverSocket);
-			CSocket_fnRecvSocket(rec);
-			closesocket(rec);
+			HANDLE handle = (HANDLE)_beginthreadex(NULL, 0, CSocket_fnRecvSocket, rec, 0, NULL);
 		}
 	}
-
-	//system("pause");
 	return 0;
 	
 }

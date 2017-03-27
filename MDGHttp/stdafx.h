@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "CSocket.h"
 #include "CHttp.h"
+#include <windows.h>  
 
 #pragma comment(lib, "ws2_32.lib")  /* WinSock使用的库函数 */
  

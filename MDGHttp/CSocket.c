@@ -139,6 +139,7 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 
 	fclose(res_file);
 	closesocket(CSocket_acpt_soc);
+	printf("[Web] closesocket\n");
 	return 0;
 }
 
