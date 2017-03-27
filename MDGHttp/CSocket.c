@@ -117,7 +117,7 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	if (type == NULL)
 	{
 		type = "text/html";
-		return -1;
+		//return -1;
 	}
 
 	int i = 0;
@@ -138,9 +138,6 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	} while ((read_len > 0) && (file_len > 0));
 
 	fclose(res_file);
-
-	/*int len1 = strlen(read_buf);
-	result = CSocket_FnSend_response(CSocket_acpt_soc, read_buf, len-1);*/
 	closesocket(CSocket_acpt_soc);
 	return 0;
 }
@@ -151,24 +148,6 @@ void CSocket_fnClose(int CSocket)
 	WSACleanup();
 	printf("[Web] stopped.\n");
 }
-
-///发送响应数据
-//int CSocket_FnSend_response(SOCKET soc, char *buf, int buf_len)
-//{
-//	// 构造 HTTP 首
-//	int i = 0;
-//	i+= http_fnSendHeaders(soc);
-//	char rec[1024];
-//	int recv_len = recv(soc, rec, 1024, 0);
-//	//
-//	i+= http_fnSendContent(soc,buf, buf_len);
-//	if (1 != 0)
-//	{
-//		//error 
-//		//TODO
-//	}
-//	return 1;
-//}
 
 
 int get_line(int sock, char *buf, int size)

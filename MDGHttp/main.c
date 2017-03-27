@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 			///¸ÄÏß³Ì TODO
 			int rec = CSocket_fnAcceptSocket(serverSocket);
 			CSocket_fnRecvSocket(rec);
+			closesocket(rec);
 		}
 	}
 
