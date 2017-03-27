@@ -78,11 +78,12 @@ int CSocket_fnAcceptSocket(int  CSocket_srv_soc)
 **/
 int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 {
+	//获取请求体信息
 	CSocket_HttpReq = http_fnGetHeaders(CSocket_acpt_soc);
 
 	int urlLen = strlen(CSocket_HttpReq.url);
 	char read_buf[HTTP_BUF_SIZE];
-	char filename[1024];
+	char filename[HTTP_BUF_SIZE];
 	FILE *res_file;
 	strcpy(filename, HTTP_HOME);
 	if (urlLen <= 1)
@@ -92,14 +93,11 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	else
 	{
 		strcat(filename, CSocket_HttpReq.url);
-		//strcat(filename, '\0');
 	}
-	res_file = fopen(filename, "rb+"); /* 用二进制格式打开文件 */
+	res_file = fopen(filename, "rb+"); 
 	if (res_file == NULL)
 	{
 		printf("[Web] The file [%s] is not existed\n", filename);
-		/*strcpy(filename, HTTP_HOME);
-		strcat(filename, "/index.html\0");*/
 		return 0;
 	}
 	printf("[Web] Open file [%s]\n", filename);
@@ -122,8 +120,8 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 
 	int i = 0;
 	i += http_fnSendHeaders(CSocket_acpt_soc, type);
-	char rec[1024];
-	int recv_len = recv(CSocket_acpt_soc, rec, 1024, 0);
+	char rec[HTTP_BUF_SIZE];
+	int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
 	//
 	int send_len = 0;
 	do /* 发送文件, HTTP 的消息体 */
