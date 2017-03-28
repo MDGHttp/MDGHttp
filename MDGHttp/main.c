@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 		printf("%s\n", *++argv);
 		if (strcmp(argv,"server") == 0)
 		{
-			///TODO 服务模式启动
+			///TODO 服务模式启动  TODO
 
 		}
 	}	
