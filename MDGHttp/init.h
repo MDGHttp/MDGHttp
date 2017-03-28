@@ -4,7 +4,6 @@
 int init();
 
 //
-char httpheader[1024];
 
 /*请求头的属性*/
 struct http_st_HttpReq

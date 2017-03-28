@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <stdlib.h>
-#include "CSocket.h"
-#include "CHttp.h"
 #include <windows.h>  
 #include "System.h"
+#include "MDGHttp.h"
+#include "Tools.h"
 
 #pragma comment(lib, "ws2_32.lib")  /* WinSock使用的库函数 */
  

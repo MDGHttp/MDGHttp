@@ -142,18 +142,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CHttp.c" />
-    <ClCompile Include="CSocket.c" />
     <ClCompile Include="init.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="MDGHttp.c" />
     <ClCompile Include="System.c" />
+    <ClCompile Include="Tools.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CHttp.h" />
-    <ClInclude Include="CSocket.h" />
     <ClInclude Include="init.h" />
+    <ClInclude Include="MDGHttp.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="System.h" />
+    <ClInclude Include="Tools.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

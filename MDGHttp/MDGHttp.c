@@ -1,13 +1,7 @@
 #include "stdafx.h"
 
 ///变量区
-struct sockaddr_in CSocket_serv_addr;   
-struct sockaddr_in CSocket_from_addr;   
-char CSocket_recv_buf[HTTP_BUF_SIZE];
-unsigned short CSocket_port = HTTP_DEF_PORT;
-int from_len = sizeof(CSocket_from_addr);
-int result = 0, recv_len;
-struct http_st_HttpReq CSocket_HttpReq;
+struct sockaddr_in CSocket_from_addr;
 
 /* 定义文件类型对应的 Content-Type */
 struct doc_type
@@ -28,41 +22,42 @@ struct doc_type file_type[] =
 	{ NULL,      NULL }
 };
 
-int CSocket_fnInitSocket()
+int MDGHttp()
 {
 	WSADATA CSocket_wsa_data;
 	WSAStartup(MAKEWORD(2, 0), &CSocket_wsa_data); /* 初始化 WinSock 资源 */
 
-	SOCKET CSocket_srv_soc = socket(AF_INET, SOCK_STREAM, 0); /* 创建 socket */
-	if (CSocket_srv_soc == INVALID_SOCKET)
+	SOCKET HttpServer = socket(AF_INET, SOCK_STREAM, 0); /* 创建 socket */
+	if (HttpServer == INVALID_SOCKET)
 	{
 		printf("[Web] WSAStartup error = %d\n", WSAGetLastError());
 		return -1;
 	}
-
+	struct sockaddr_in CSocket_serv_addr;
 	/* 服务器地址 */
 	CSocket_serv_addr.sin_family = AF_INET;
-	CSocket_serv_addr.sin_port = htons(CSocket_port);
+	CSocket_serv_addr.sin_port = htons(HTTP_DEF_PORT);
 	CSocket_serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	result = bind(CSocket_srv_soc, (struct sockaddr *) &CSocket_serv_addr, sizeof(CSocket_serv_addr));
+	int result = bind(HttpServer, (struct sockaddr *) &CSocket_serv_addr, sizeof(CSocket_serv_addr));
 	if (result == SOCKET_ERROR) /* 绑定失败 */
 	{
-		closesocket(CSocket_srv_soc);
+		closesocket(HttpServer);
 		printf("[Web] bind error = %d\n", WSAGetLastError());
 		return -1;
 	}
 
-	result = listen(CSocket_srv_soc, SOMAXCONN);
-	printf("[Web] running ... ...\n");
-	return CSocket_srv_soc;
+	result = listen(HttpServer, SOMAXCONN);
+	printf("[Web] MDGHttp Server Running ... ...\n");
+	return HttpServer;
 }
 
-int CSocket_fnAcceptSocket(int  CSocket_srv_soc)
+int MDGHttp_Accept(int CSocket_srv_soc)
 {
 	//等待介入
-	SOCKET CSocket_acpt_soc = accept(CSocket_srv_soc, (struct sockaddr *) &CSocket_from_addr, &from_len);
-	if (CSocket_acpt_soc == INVALID_SOCKET) 
+	int len = sizeof(CSocket_from_addr);
+	SOCKET CSocket_acpt_soc = accept(CSocket_srv_soc, (struct sockaddr *)&CSocket_from_addr, &len);
+	if (CSocket_acpt_soc == INVALID_SOCKET)
 	{
 		printf("[Web] 链接失败 ： %d\n", WSAGetLastError());
 		return -1;
@@ -76,9 +71,10 @@ int CSocket_fnAcceptSocket(int  CSocket_srv_soc)
 /**
 重_____
 **/
-int CSocket_fnRecvSocket(int CSocket_acpt_soc)
+int MDGHttp_Resp(int CSocket_acpt_soc)
 {
 	//获取请求体信息
+	struct http_st_HttpReq CSocket_HttpReq;
 	CSocket_HttpReq = http_fnGetHeaders(CSocket_acpt_soc);
 
 	int urlLen = strlen(CSocket_HttpReq.url);
@@ -94,7 +90,7 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	{
 		strcat(filename, CSocket_HttpReq.url);
 	}
-	res_file = fopen(filename, "rb+"); 
+	res_file = fopen(filename, "rb+");
 	if (res_file == NULL)
 	{
 		printf("[Web] The file [%s] is not existed\n", filename);
@@ -116,7 +112,7 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	{
 		type = "text/html";
 		//return -1;
-		if (Indexof(filename,"py") >= 0)
+		if (Indexof(filename, "py") >= 0)
 		{
 			char result[1024] = "";                   //定义存放结果的字符串数组 
 			if (1 == fnGetCmdOut("python D:\\Http\\index.py", result)) {
@@ -126,7 +122,7 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 				i += http_fnSendHeaders(CSocket_acpt_soc, type);
 				int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
 				int pylen = send(CSocket_acpt_soc, result, 1024, 0);
-			    pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
+				pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
 				fclose(res_file);
 				closesocket(CSocket_acpt_soc);
 				printf("[Web] closesocket\n");
@@ -158,6 +154,77 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	fclose(res_file);
 	closesocket(CSocket_acpt_soc);
 	printf("[Web] closesocket\n");
+	return 0;
+}
+
+struct http_st_HttpReq http_fnGetHeaders(int CSocket_acpt_soc)
+{
+	struct http_st_HttpReq req;
+	char buf[1024];// = '\0';
+	int recv_len = 1;
+	recv_len = get_line(CSocket_acpt_soc, buf, sizeof(buf));
+	strcpy(req.header, buf);
+	//printf("1=%s", buf);
+	//int uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
+	//printf("2=%s", buf);
+	//int jjj = 3;
+	//while (uu >= 0)
+	//{
+	//	if (jjj == 13)
+	//	{
+	//		int sdfa = 0;
+	//		sdfa++;
+	//	}
+	//	uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
+	//	printf("%d=%s",jjj++, buf);
+	//}
+	//uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
+	//printf("%d=%s", 45, buf);
+	//获取文件
+	int ch = 0, j = 0;
+	for (size_t i = 0; i < recv_len; i++)
+	{
+		if (req.header[i] == ' ')
+		{
+			ch++;
+			continue;
+		}
+		if (ch == 1)
+		{
+			req.url[j++] = req.header[i];
+		}
+		if (ch > 1)
+		{
+			break;
+		}
+	}
+	req.url[j] = '\0';
+	return req;
+}
+
+int http_fnSendHeaders(int client, char *ContentType)
+{
+	//  Connection:keep - alive
+	//	Content - Length : 252
+	//	Content - Type : application / json; charset = utf - 8
+	//	Date:Sun, 26 Mar 2017 05 : 55 : 07 GMT
+	//	Server : Apache
+	char buf[512];
+	/*正常的 HTTP header */
+	strcpy(buf, "HTTP/1.0 200 OK\r\n");
+	send(client, buf, strlen(buf), 0);
+	/*服务器信息*/
+	strcpy(buf, "Server: MDGHttp1.0\r\n");
+	send(client, buf, strlen(buf), 0);
+	strcpy(buf, "Connection:keep-alive\r\n");//Referrer Policy:unsafe-url
+	send(client, buf, strlen(buf), 0);
+	char str[256] = "Content-Type: ";//: {0};charset=utf-8\r\n";
+	strcat(str, ContentType);
+	strcat(str, ";charset=utf-8\r\n");
+	sprintf(buf, str);
+	send(client, buf, strlen(buf), 0);
+	strcpy(buf, "\r\n");
+	send(client, buf, strlen(buf), 0);
 	return 0;
 }
 
@@ -205,30 +272,11 @@ char *CHttp_getType(const char *suf)
 
 	for (type = file_type; type->suffix; type++)
 	{
-		int i = Indexof(suf,type->suffix );
-		if ( i >= 0)
+		int i = Indexof(suf, type->suffix);
+		if (i >= 0)
 			return type->type;
 	}
 
 	return NULL;
 }
 
-int Indexof(const char *pSrc, const char *pDst)
-{
-	int i, j;
-	for (i = 0; pSrc[i] != '\0'; i++)
-	{
-		if (pSrc[i] != pDst[0])
-			continue;
-		j = 0;
-		while (pDst[j] != '\0' && pSrc[i + j] != '\0')
-		{
-			j++;
-			if (pDst[j] != pSrc[i + j])
-				break;
-		}
-		if (pDst[j] == '\0')
-			return i;
-	}
-	return -1;
-}

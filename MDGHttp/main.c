@@ -20,12 +20,12 @@ int main(int argc, char *argv[])
 	int i = init();
 	if (i == 0)
 	{
-		int serverSocket = CSocket_fnInitSocket();
+		int serverSocket = MDGHttp();
 		while (1)
 		{
 			///¸ÄÏß³Ì
-			int rec = CSocket_fnAcceptSocket(serverSocket);
-			HANDLE handle = (HANDLE)_beginthreadex(NULL, 0, CSocket_fnRecvSocket, rec, 0, NULL);
+			int rec = MDGHttp_Accept(serverSocket);
+			HANDLE handle = (HANDLE)_beginthreadex(NULL, 0, MDGHttp_Resp, rec, 0, NULL);
 		}
 	}
 	return 0;
