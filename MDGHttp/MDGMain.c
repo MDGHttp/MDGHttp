@@ -20,14 +20,13 @@ int main(int argc, char *argv[])
 	int i = init();
 	if (i == 0)
 	{
-		int serverSocket = MDGHttp();
+		int mHttpHandle = MDGHttp();
 		while (1)
 		{
 			///¸ÄÏß³Ì
-			int rec = MDGHttp_Accept(serverSocket);
-			HANDLE handle = (HANDLE)_beginthreadex(NULL, 0, MDGHttp_Resp, rec, 0, NULL);
+			int mHttp_Rec = MDGHttp_Accept(mHttpHandle);
+			HANDLE handle = (HANDLE)_beginthreadex(NULL, 0, MDGHttp_Resp, mHttp_Rec, 0, NULL);
 		}
 	}
-	return 0;
-	
+	return 0;	
 }
