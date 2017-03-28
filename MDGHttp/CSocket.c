@@ -116,6 +116,25 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 	{
 		type = "text/html";
 		//return -1;
+		if (Indexof(filename,"py") >= 0)
+		{
+			char result[1024] = "";                   //定义存放结果的字符串数组 
+			if (1 == fnGetCmdOut("python D:\\Http\\index.py", result)) {
+				printf(result);
+				char rec[HTTP_BUF_SIZE];
+				int i = 0;
+				i += http_fnSendHeaders(CSocket_acpt_soc, type);
+				int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
+				int pylen = send(CSocket_acpt_soc, result, 1024, 0);
+			    pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
+				fclose(res_file);
+				closesocket(CSocket_acpt_soc);
+				printf("[Web] closesocket\n");
+				return 0;
+			}
+			//int pylen = send(CSocket_acpt_soc, result, read_len, 0);
+		}
+		type = "text/html";
 	}
 
 	int i = 0;
@@ -134,6 +153,7 @@ int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 			file_len -= read_len;
 		}
 	} while ((read_len > 0) && (file_len > 0));
+	send_len = send(CSocket_acpt_soc, "\r\n", strlen("\r\n"), 0);
 
 	fclose(res_file);
 	closesocket(CSocket_acpt_soc);

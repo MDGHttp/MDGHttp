@@ -27,6 +27,9 @@
     <ClCompile Include="CHttp.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="System.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -39,6 +42,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CHttp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="System.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

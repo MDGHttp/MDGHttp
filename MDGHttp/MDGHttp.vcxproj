@@ -146,12 +146,14 @@
     <ClCompile Include="CSocket.c" />
     <ClCompile Include="init.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="System.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CHttp.h" />
     <ClInclude Include="CSocket.h" />
     <ClInclude Include="init.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="System.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
