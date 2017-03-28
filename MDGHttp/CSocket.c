@@ -74,7 +74,7 @@ int CSocket_fnAcceptSocket(int  CSocket_srv_soc)
 }
 
 /**
-жи
+жи_____
 **/
 int CSocket_fnRecvSocket(int CSocket_acpt_soc)
 {

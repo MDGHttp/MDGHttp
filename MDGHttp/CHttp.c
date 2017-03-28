@@ -2,12 +2,26 @@
 
 struct http_st_HttpReq http_fnGetHeaders(int CSocket_acpt_soc)
 {
+	//TODO
+	char buf1[10240];
+	int yn = recv(CSocket_acpt_soc, buf1, 10240, MSG_PEEK);
+	printf("0=%s", buf1);
 	struct http_st_HttpReq req;
 	char buf[1024];// = '\0';
 	int recv_len = 1;
 	recv_len = get_line(CSocket_acpt_soc, buf,sizeof(buf));
 	strcpy(req.header, buf);
-	
+	printf("1=%s", buf);
+	int uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
+	printf("2=%s", buf);
+	int jjj = 3;
+	while (uu >= 0)
+	{
+		uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
+		printf("%d=%s",jjj++, buf);
+	}
+	uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
+	printf("%d=%s", 45, buf);
 	//获取文件
 	int ch = 0,j=0;
 	for (size_t i = 0; i < recv_len; i++)
