@@ -22,6 +22,8 @@ struct doc_type file_type[] =
 	{ NULL,      NULL }
 };
 
+char OutPut[102400] = "";
+
 int MDGHttp()
 {
 	WSADATA CSocket_wsa_data;
@@ -112,23 +114,46 @@ int MDGHttp_Resp(int CSocket_acpt_soc)
 	{
 		type = "text/html";
 		//return -1;
-		if (Indexof(filename, "py") >= 0)
+		if (Indexof(filename, ".py") >= 0)
 		{
-			char result[1024] = "";                   //定义存放结果的字符串数组 
-			if (1 == fnGetCmdOut("python D:\\Http\\index.py", result)) {
-				printf(result);
+			char cmdbuf[1024] = "";
+			strcpy(cmdbuf, "python ");
+			strcat(cmdbuf, filename);
+			if (1 == fnGetCmdOut(cmdbuf, OutPut)) {
+				//printf(result);
 				char rec[HTTP_BUF_SIZE];
 				int i = 0;
 				i += http_fnSendHeaders(CSocket_acpt_soc, type);
 				int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
-				int pylen = send(CSocket_acpt_soc, result, 1024, 0);
+				int pylen = send(CSocket_acpt_soc, OutPut, strlen(OutPut), 0);
 				pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
 				fclose(res_file);
 				closesocket(CSocket_acpt_soc);
+				OutPut[0] = '\0';
 				printf("[Web] closesocket\n");
 				return 0;
 			}
 			//int pylen = send(CSocket_acpt_soc, result, read_len, 0);
+		}
+		else if (Indexof(filename, ".php") >= 0)
+		{                  //定义存放结果的字符串数组 
+			char cmdbuf[1024] = "";
+			strcpy(cmdbuf, "php ");
+			strcat(cmdbuf, filename);
+			if (1 == fnGetCmdOut(cmdbuf, OutPut)) {
+				//printf(result);
+				char rec[HTTP_BUF_SIZE];
+				int i = 0;
+				i += http_fnSendHeaders(CSocket_acpt_soc, type);
+				int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
+				int pylen = send(CSocket_acpt_soc, OutPut, strlen(OutPut), 0);
+				pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
+				fclose(res_file);
+				closesocket(CSocket_acpt_soc);
+				OutPut[0] = '\0';
+				printf("[Web] closesocket\n");
+				return 0;
+			}
 		}
 		type = "text/html";
 	}
