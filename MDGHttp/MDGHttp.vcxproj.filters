@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="init.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -28,6 +25,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Tools.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MDGMain.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
