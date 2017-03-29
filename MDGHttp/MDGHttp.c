@@ -22,7 +22,7 @@ struct doc_type file_type[] =
 	{ NULL,      NULL }
 };
 
-char OutPut[102400] = "";
+
 
 int MDGHttp()
 {
@@ -82,7 +82,7 @@ int MDGHttp_Resp(int CSocket_acpt_soc)
 	int urlLen = strlen(CSocket_HttpReq.url);
 	char read_buf[HTTP_BUF_SIZE];
 	char filename[HTTP_FILENAME_LEN];
-	FILE *res_file;
+	
 	strcpy(filename, HTTP_HOME);
 	if (urlLen <= 1)
 	{
@@ -92,20 +92,6 @@ int MDGHttp_Resp(int CSocket_acpt_soc)
 	{
 		strcat(filename, CSocket_HttpReq.url);
 	}
-	res_file = fopen(filename, "rb+");
-	if (res_file == NULL)
-	{
-		printf("[Web] The file [%s] is not existed\n", filename);
-		return 0;
-	}
-	printf("[Web] Open file [%s]\n", filename);
-	fseek(res_file, 0, SEEK_END);
-	int file_len = ftell(res_file);
-	fseek(res_file, 0, SEEK_SET);
-	//char read_buf[2048];
-	int read_len = 0;
-	/* 向客户端发送响应数据 */
-
 	// 构造 HTTP 首
 	//获取mime类型
 	char *type;
@@ -116,64 +102,43 @@ int MDGHttp_Resp(int CSocket_acpt_soc)
 		//return -1;
 		if (Indexof(filename, ".py") >= 0)
 		{
-		 HttpSendPython(filename,res_file, type, CSocket_acpt_soc);
+		 HttpSendPython(filename, type, CSocket_acpt_soc);
 			return 0;
 		}
 		else if (Indexof(filename, ".php") >= 0)
 		{                  //定义存放结果的字符串数组 
-			HttpSendPhp(filename, res_file, type, CSocket_acpt_soc);
+			HttpSendPhp(filename, type, CSocket_acpt_soc);
 			return 0;
 		}
 		type = "text/html";
 	}
-
-	int i = 0;
-	i += http_fnSendHeaders(CSocket_acpt_soc, type);
-	char rec[HTTP_BUF_SIZE];
-	int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
-	//
-	int send_len = 0;
-	do /* 发送文件, HTTP 的消息体 */
-	{
-		read_len = fread(read_buf, sizeof(char), HTTP_BUF_SIZE, res_file);
-
-		if (read_len > 0)
-		{
-			send_len = send(CSocket_acpt_soc, read_buf, read_len, 0);
-			file_len -= read_len;
-		}
-	} while ((read_len > 0) && (file_len > 0));
-	send_len = send(CSocket_acpt_soc, "\r\n", strlen("\r\n"), 0);
-
-	fclose(res_file);
-	closesocket(CSocket_acpt_soc);
-	printf("[Web] closesocket\n");
+	HttpSendFile(filename,type,CSocket_acpt_soc);
 	return 0;
 }
 
 struct http_st_HttpReq http_fnGetHeaders(int CSocket_acpt_soc)
 {
+	//TODO-Test
+	//int n = 0;
+	//char c = '\0';
+	//while (1)
+	//{
+	//     n = recv(CSocket_acpt_soc, &c, 1, 0);
+	//	 printf("%c", c);
+	//	 if (c == '\n')
+	//	 {
+	//		 printf("============",c);
+	//		 //break;
+	//	 }
+	//}
+	
+
+
 	struct http_st_HttpReq req;
 	char buf[1024];// = '\0';
 	int recv_len = 1;
 	recv_len = get_line(CSocket_acpt_soc, buf, sizeof(buf));
 	strcpy(req.header, buf);
-	//printf("1=%s", buf);
-	//int uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
-	//printf("2=%s", buf);
-	//int jjj = 3;
-	//while (uu >= 0)
-	//{
-	//	if (jjj == 13)
-	//	{
-	//		int sdfa = 0;
-	//		sdfa++;
-	//	}
-	//	uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
-	//	printf("%d=%s",jjj++, buf);
-	//}
-	//uu = get_line(CSocket_acpt_soc, buf, sizeof(buf));
-	//printf("%d=%s", 45, buf);
 	//获取文件
 	int ch = 0, j = 0;
 	for (size_t i = 0; i < recv_len; i++)
@@ -205,7 +170,7 @@ int http_fnSendHeaders(int client, char *ContentType)
 	//	Server : Apache
 	char buf[512];
 	/*正常的 HTTP header */
-	strcpy(buf, "HTTP/1.0 200 OK\r\n");
+	strcpy(buf, "HTTP/1.1 200 OK\r\n");
 	send(client, buf, strlen(buf), 0);
 	/*服务器信息*/
 	strcpy(buf, "Server: MDGHttp1.0\r\n");
@@ -274,8 +239,17 @@ char *CHttp_getType(const char *suf)
 	return NULL;
 }
 
-int HttpSendPhp(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc)
+int HttpSendPhp(char *filename, char *type, int CSocket_acpt_soc)
 {
+	char OutPut[10240] = "";
+	FILE *res_file;
+	res_file = fopen(filename, "rb+");
+	if (res_file == NULL)
+	{
+		printf("[Web] The file [%s] is not existed\n", filename);
+		return 0;
+	}
+	printf("[Web] Open file [%s]\n", filename);
 	char cmdbuf[1024] = "";
 	strcpy(cmdbuf, "php ");
 	strcat(cmdbuf, filename);
@@ -295,8 +269,17 @@ int HttpSendPhp(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc
 }
 
 
-int HttpSendPython(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc)
+int HttpSendPython(char *filename, char *type, int CSocket_acpt_soc)
 {
+	char OutPut[10240] = "";
+	FILE *res_file;
+	res_file = fopen(filename, "rb+");
+	if (res_file == NULL)
+	{
+		printf("[Web] The file [%s] is not existed\n", filename);
+		return 0;
+	}
+	printf("[Web] Open file [%s]\n", filename);
 	char cmdbuf[1024] = "";
 	strcpy(cmdbuf, "python ");
 	strcat(cmdbuf, filename);
@@ -316,28 +299,41 @@ int HttpSendPython(char *filename, FILE *res_file, char *type, int CSocket_acpt_
 	}
 }
 
-//int HttpSendFile(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc)
-//{
-//	int i = 0;
-//	i += http_fnSendHeaders(CSocket_acpt_soc, type);
-//	char rec[HTTP_BUF_SIZE];
-//	int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
-//	//
-//	int send_len = 0;
-//	do /* 发送文件, HTTP 的消息体 */
-//	{
-//		read_len = fread(read_buf, sizeof(char), HTTP_BUF_SIZE, res_file);
-//
-//		if (read_len > 0)
-//		{
-//			send_len = send(CSocket_acpt_soc, read_buf, read_len, 0);
-//			file_len -= read_len;
-//		}
-//	} while ((read_len > 0) && (file_len > 0));
-//	send_len = send(CSocket_acpt_soc, "\r\n", strlen("\r\n"), 0);
-//
-//	fclose(res_file);
-//	closesocket(CSocket_acpt_soc);
-//	printf("[Web] closesocket\n");
-//	return 0;
-//}
+int HttpSendFile(char *filename, char *type, int CSocket_acpt_soc)
+{
+	FILE *res_file;
+	res_file = fopen(filename, "rb+");
+	if (res_file == NULL)
+	{
+		printf("[Web] The file [%s] is not existed\n", filename);
+		return 0;
+	}
+	printf("[Web] Open file [%s]\n", filename);
+	int i = 0;
+	i += http_fnSendHeaders(CSocket_acpt_soc, type);
+	char rec[HTTP_BUF_SIZE];
+	int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
+	//
+	fseek(res_file, 0, SEEK_END);
+	int file_len = ftell(res_file);
+	fseek(res_file, 0, SEEK_SET);
+	int read_len = 0;
+	int send_len = 0;
+	char read_buf[HTTP_BUF_SIZE];
+	do /* 发送文件, HTTP 的消息体 */
+	{
+		read_len = fread(read_buf, sizeof(char), HTTP_BUF_SIZE, res_file);
+
+		if (read_len > 0)
+		{
+			send_len = send(CSocket_acpt_soc, read_buf, read_len, 0);
+			file_len -= read_len;
+		}
+	} while ((read_len > 0) && (file_len > 0));
+	send_len = send(CSocket_acpt_soc, "\r\n", strlen("\r\n"), 0);
+	printf("[Web] OUT : %s\n", filename);
+	fclose(res_file);
+	closesocket(CSocket_acpt_soc);
+	printf("[Web] closesocket\n");
+	return 0;
+}
