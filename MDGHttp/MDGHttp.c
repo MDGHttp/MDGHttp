@@ -315,3 +315,29 @@ int HttpSendPython(char *filename, FILE *res_file, char *type, int CSocket_acpt_
 		return 0;
 	}
 }
+
+//int HttpSendFile(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc)
+//{
+//	int i = 0;
+//	i += http_fnSendHeaders(CSocket_acpt_soc, type);
+//	char rec[HTTP_BUF_SIZE];
+//	int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
+//	//
+//	int send_len = 0;
+//	do /* 发送文件, HTTP 的消息体 */
+//	{
+//		read_len = fread(read_buf, sizeof(char), HTTP_BUF_SIZE, res_file);
+//
+//		if (read_len > 0)
+//		{
+//			send_len = send(CSocket_acpt_soc, read_buf, read_len, 0);
+//			file_len -= read_len;
+//		}
+//	} while ((read_len > 0) && (file_len > 0));
+//	send_len = send(CSocket_acpt_soc, "\r\n", strlen("\r\n"), 0);
+//
+//	fclose(res_file);
+//	closesocket(CSocket_acpt_soc);
+//	printf("[Web] closesocket\n");
+//	return 0;
+//}
