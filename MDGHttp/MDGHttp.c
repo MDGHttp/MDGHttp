@@ -79,7 +79,7 @@ int MDGHttp_Resp(int CSocket_acpt_soc)
 
 	int urlLen = strlen(CSocket_HttpReq.url);
 	char read_buf[HTTP_BUF_SIZE];
-	char filename[HTTP_BUF_SIZE];
+	char filename[HTTP_FILENAME_LEN];
 	FILE *res_file;
 	strcpy(filename, HTTP_HOME);
 	if (urlLen <= 1)
