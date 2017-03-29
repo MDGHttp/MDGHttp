@@ -116,44 +116,13 @@ int MDGHttp_Resp(int CSocket_acpt_soc)
 		//return -1;
 		if (Indexof(filename, ".py") >= 0)
 		{
-			char cmdbuf[1024] = "";
-			strcpy(cmdbuf, "python ");
-			strcat(cmdbuf, filename);
-			if (1 == fnGetCmdOut(cmdbuf, OutPut)) {
-				//printf(result);
-				char rec[HTTP_BUF_SIZE];
-				int i = 0;
-				i += http_fnSendHeaders(CSocket_acpt_soc, type);
-				int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
-				int pylen = send(CSocket_acpt_soc, OutPut, strlen(OutPut), 0);
-				pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
-				fclose(res_file);
-				closesocket(CSocket_acpt_soc);
-				OutPut[0] = '\0';
-				printf("[Web] closesocket\n");
-				return 0;
-			}
-			//int pylen = send(CSocket_acpt_soc, result, read_len, 0);
+		 HttpSendPython(filename,res_file, type, CSocket_acpt_soc);
+			return 0;
 		}
 		else if (Indexof(filename, ".php") >= 0)
 		{                  //定义存放结果的字符串数组 
-			char cmdbuf[1024] = "";
-			strcpy(cmdbuf, "php ");
-			strcat(cmdbuf, filename);
-			if (1 == fnGetCmdOut(cmdbuf, OutPut)) {
-				//printf(result);
-				char rec[HTTP_BUF_SIZE];
-				int i = 0;
-				i += http_fnSendHeaders(CSocket_acpt_soc, type);
-				int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
-				int pylen = send(CSocket_acpt_soc, OutPut, strlen(OutPut), 0);
-				pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
-				fclose(res_file);
-				closesocket(CSocket_acpt_soc);
-				OutPut[0] = '\0';
-				printf("[Web] closesocket\n");
-				return 0;
-			}
+			HttpSendPhp(filename, res_file, type, CSocket_acpt_soc);
+			return 0;
 		}
 		type = "text/html";
 	}
@@ -305,3 +274,44 @@ char *CHttp_getType(const char *suf)
 	return NULL;
 }
 
+int HttpSendPhp(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc)
+{
+	char cmdbuf[1024] = "";
+	strcpy(cmdbuf, "php ");
+	strcat(cmdbuf, filename);
+	if (1 == fnGetCmdOut(cmdbuf, OutPut)) {
+		char rec[HTTP_BUF_SIZE];
+		int i = 0;
+		i += http_fnSendHeaders(CSocket_acpt_soc, type);
+		int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
+		int pylen = send(CSocket_acpt_soc, OutPut, strlen(OutPut), 0);
+		pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
+		fclose(res_file);
+		closesocket(CSocket_acpt_soc);
+		OutPut[0] = '\0';
+		printf("[Web] closesocket\n");
+		return 0;
+	}
+}
+
+
+int HttpSendPython(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc)
+{
+	char cmdbuf[1024] = "";
+	strcpy(cmdbuf, "python ");
+	strcat(cmdbuf, filename);
+	if (1 == fnGetCmdOut(cmdbuf, OutPut)) {
+		//printf(result);
+		char rec[HTTP_BUF_SIZE];
+		int i = 0;
+		i += http_fnSendHeaders(CSocket_acpt_soc, type);
+		int recv_len = recv(CSocket_acpt_soc, rec, HTTP_BUF_SIZE, 0);
+		int pylen = send(CSocket_acpt_soc, OutPut, strlen(OutPut), 0);
+		pylen = send(CSocket_acpt_soc, "\r\n", 4, 0);
+		fclose(res_file);
+		closesocket(CSocket_acpt_soc);
+		OutPut[0] = '\0';
+		printf("[Web] closesocket\n");
+		return 0;
+	}
+}

@@ -9,3 +9,5 @@ int http_fnSendHeaders(int client, char *ContentType);
 void CSocket_fnClose(int CSocket);
 char *CHttp_getType(const char *suf);
 int get_line(int sock, char *buf, int size);
+int HttpSendPhp(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc);
+int HttpSendPython(char *filename, FILE *res_file, char *type, int CSocket_acpt_soc);
